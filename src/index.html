@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global Team Map</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🌍 Global Team Map</h1>
+        <p>Add team members and see their locations on the map</p>
+      </header>
+
+      <div class="content">
+        <div class="sidebar">
+          <div class="add-member-form">
+            <h2>Add Team Member</h2>
+            <form id="memberForm">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  required
+                  placeholder="Enter name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <input
+                  type="text"
+                  id="role"
+                  placeholder="e.g., Developer, Designer"
+                />
+              </div>
+              <div class="form-group">
+                <label for="location">Location</label>
+                <input
+                  type="text"
+                  id="location"
+                  required
+                  placeholder="e.g., New York, USA"
+                />
+              </div>
+              <div class="form-group">
+                <label for="latitude">Latitude</label>
+                <input
+                  type="number"
+                  id="latitude"
+                  step="any"
+                  required
+                  placeholder="e.g., 40.7128"
+                />
+              </div>
+              <div class="form-group">
+                <label for="longitude">Longitude</label>
+                <input
+                  type="number"
+                  id="longitude"
+                  step="any"
+                  required
+                  placeholder="e.g., -74.0060"
+                />
+              </div>
+              <button type="submit" class="btn-primary">Add Member</button>
+            </form>
+          </div>
+
+          <div class="team-list">
+            <h2>Team Members (<span id="memberCount">0</span>)</h2>
+            <div id="membersList"></div>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
