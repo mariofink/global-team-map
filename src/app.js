@@ -28,6 +28,17 @@ class GlobalTeamApp {
   initEventListeners() {
     const form = document.getElementById("memberForm");
     form.addEventListener("submit", (e) => this.handleAddMember(e));
+
+    const exportBtn = document.getElementById("exportBtn");
+    exportBtn.addEventListener("click", () => this.handleExport());
+
+    const importBtn = document.getElementById("importBtn");
+    const fileInput = document.getElementById("fileInput");
+    importBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => this.handleImport(e));
+
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn.addEventListener("click", () => this.handleCopy());
   }
 
   handleAddMember(e) {
@@ -192,6 +203,145 @@ class GlobalTeamApp {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  handleExport() {
+    if (this.members.length === 0) {
+      alert("No team members to export!");
+      return;
+    }
+
+    const dataStr = JSON.stringify(this.members, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `global-team-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    this.showNotification(
+      "Team data exported! Share the file with others.",
+      "success"
+    );
+  }
+
+  handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+
+        if (!Array.isArray(imported)) {
+          throw new Error("Invalid file format");
+        }
+
+        // Validate structure
+        const isValid = imported.every(
+          (m) =>
+            m.name &&
+            m.location &&
+            typeof m.latitude === "number" &&
+            typeof m.longitude === "number"
+        );
+
+        if (!isValid) {
+          throw new Error("Invalid team data structure");
+        }
+
+        // Ask for confirmation if there's existing data
+        if (this.members.length > 0) {
+          const replace = confirm(
+            `You have ${this.members.length} existing team member(s). Replace with ${imported.length} imported member(s)?`
+          );
+          if (!replace) {
+            event.target.value = ""; // Reset file input
+            return;
+          }
+        }
+
+        this.members = imported;
+        this.saveMembers();
+        this.renderMembers();
+        this.updateMap();
+
+        this.showNotification(
+          `Successfully imported ${imported.length} team member(s)!`,
+          "success"
+        );
+      } catch (error) {
+        alert("Error importing file: " + error.message);
+      }
+      event.target.value = ""; // Reset file input
+    };
+
+    reader.readAsText(file);
+  }
+
+  handleCopy() {
+    if (this.members.length === 0) {
+      alert("No team members to copy!");
+      return;
+    }
+
+    const dataStr = JSON.stringify(this.members, null, 2);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(dataStr)
+        .then(() => {
+          this.showNotification(
+            "Team data copied to clipboard! Paste it to share.",
+            "success"
+          );
+        })
+        .catch(() => {
+          this.fallbackCopyToClipboard(dataStr);
+        });
+    } else {
+      this.fallbackCopyToClipboard(dataStr);
+    }
+  }
+
+  fallbackCopyToClipboard(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand("copy");
+      this.showNotification(
+        "Team data copied to clipboard! Paste it to share.",
+        "success"
+      );
+    } catch (err) {
+      prompt("Copy this data to share:", text);
+    }
+    document.body.removeChild(textarea);
+  }
+
+  showNotification(message, type = "success") {
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => notification.classList.add("show"), 10);
+
+    setTimeout(() => {
+      notification.classList.remove("show");
+      setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
   }
 }
 
