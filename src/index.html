@@ -41,12 +41,19 @@
               </div>
               <div class="form-group">
                 <label for="location">Location</label>
-                <input
-                  type="text"
-                  id="location"
-                  required
-                  placeholder="e.g., New York, USA"
-                />
+                <div class="location-search-wrapper">
+                  <input
+                    type="text"
+                    id="location"
+                    required
+                    placeholder="Search for a location..."
+                    autocomplete="off"
+                  />
+                  <div
+                    id="locationSuggestions"
+                    class="location-suggestions"
+                  ></div>
+                </div>
               </div>
               <div class="form-group">
                 <label for="latitude">Latitude</label>
@@ -55,7 +62,8 @@
                   id="latitude"
                   step="any"
                   required
-                  placeholder="e.g., 40.7128"
+                  placeholder="Auto-filled from location"
+                  readonly
                 />
               </div>
               <div class="form-group">
@@ -65,7 +73,8 @@
                   id="longitude"
                   step="any"
                   required
-                  placeholder="e.g., -74.0060"
+                  placeholder="Auto-filled from location"
+                  readonly
                 />
               </div>
               <button type="submit" class="btn-primary">Add Member</button>

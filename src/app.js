@@ -4,6 +4,7 @@ class GlobalTeamApp {
     this.members = this.loadMembers();
     this.map = null;
     this.markers = {};
+    this.searchTimeout = null;
     this.init();
   }
 
@@ -39,6 +40,24 @@ class GlobalTeamApp {
 
     const copyBtn = document.getElementById("copyBtn");
     copyBtn.addEventListener("click", () => this.handleCopy());
+
+    // Location search
+    const locationInput = document.getElementById("location");
+    locationInput.addEventListener("input", (e) =>
+      this.handleLocationSearch(e)
+    );
+    locationInput.addEventListener("focus", () => {
+      if (locationInput.value.length > 2) {
+        document.getElementById("locationSuggestions").style.display = "block";
+      }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".location-search-wrapper")) {
+        document.getElementById("locationSuggestions").style.display = "none";
+      }
+    });
   }
 
   handleAddMember(e) {
@@ -342,6 +361,80 @@ class GlobalTeamApp {
       notification.classList.remove("show");
       setTimeout(() => document.body.removeChild(notification), 300);
     }, 3000);
+  }
+
+  handleLocationSearch(event) {
+    const query = event.target.value.trim();
+    const suggestionsDiv = document.getElementById("locationSuggestions");
+
+    if (query.length < 3) {
+      suggestionsDiv.style.display = "none";
+      return;
+    }
+
+    // Debounce the search
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.searchLocation(query);
+    }, 300);
+  }
+
+  async searchLocation(query) {
+    const suggestionsDiv = document.getElementById("locationSuggestions");
+    suggestionsDiv.innerHTML =
+      '<div class="suggestion-loading">Searching...</div>';
+    suggestionsDiv.style.display = "block";
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query
+        )}&limit=5`
+      );
+      const results = await response.json();
+
+      if (results.length === 0) {
+        suggestionsDiv.innerHTML =
+          '<div class="suggestion-item no-results">No locations found</div>';
+        return;
+      }
+
+      suggestionsDiv.innerHTML = results
+        .map(
+          (result) => `
+          <div class="suggestion-item" data-lat="${result.lat}" data-lon="${
+            result.lon
+          }" data-name="${this.escapeHtml(result.display_name)}">
+            <div class="suggestion-name">${this.escapeHtml(
+              result.display_name
+            )}</div>
+          </div>
+        `
+        )
+        .join("");
+
+      // Add click handlers to suggestions
+      suggestionsDiv.querySelectorAll(".suggestion-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const lat = item.dataset.lat;
+          const lon = item.dataset.lon;
+          const name = item.dataset.name;
+
+          if (lat && lon) {
+            document.getElementById("location").value = name;
+            document.getElementById("latitude").value =
+              parseFloat(lat).toFixed(6);
+            document.getElementById("longitude").value =
+              parseFloat(lon).toFixed(6);
+            suggestionsDiv.style.display = "none";
+          }
+        });
+      });
+    } catch (error) {
+      suggestionsDiv.innerHTML =
+        '<div class="suggestion-item error">Error searching locations</div>';
+      console.error("Location search error:", error);
+    }
   }
 }
 
