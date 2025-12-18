@@ -1,0 +1,12 @@
+{
+  "name": "globalteam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "npx http-server ./src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
