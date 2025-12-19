@@ -51,13 +51,10 @@ header p {
   background: #f8f9fa;
   overflow-y: auto;
   border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
 }
 
-.add-member-form {
-  margin-bottom: 30px;
-}
-
-.add-member-form h2,
 .team-list h2 {
   font-size: 1.3em;
   margin-bottom: 20px;
@@ -118,8 +115,32 @@ header p {
 }
 
 .team-list {
-  border-top: 2px solid #e0e0e0;
-  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.btn-add-member {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 15px;
+}
+
+.btn-add-member:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-add-member:active {
+  transform: translateY(0);
 }
 
 .team-list-header {
@@ -223,6 +244,63 @@ header p {
   font-weight: 700;
   color: #667eea;
   font-family: "Courier New", monospace;
+}
+
+dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.dialog-content {
+  padding: 30px;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dialog-header h2 {
+  font-size: 1.5em;
+  color: #333;
+  margin: 0;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5em;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-close:hover {
+  background: #f0f0f0;
+  color: #333;
 }
 
 @media (max-width: 768px) {

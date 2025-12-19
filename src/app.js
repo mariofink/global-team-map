@@ -35,7 +35,14 @@ class GlobalTeamApp {
   }
 
   initEventListeners() {
+    const dialog = document.getElementById("memberFormDialog");
+    const openFormBtn = document.getElementById("openFormBtn");
+    const closeDialogBtn = document.getElementById("closeDialogBtn");
     const form = document.getElementById("memberForm");
+
+    openFormBtn.addEventListener("click", () => dialog.showModal());
+    closeDialogBtn.addEventListener("click", () => dialog.close());
+    
     form.addEventListener("submit", (e) => this.handleAddMember(e));
 
     const exportBtn = document.getElementById("exportBtn");
@@ -106,6 +113,9 @@ class GlobalTeamApp {
     e.target.reset();
     locationSearch.clear();
     this.selectedLocation = null;
+
+    // Close the dialog
+    document.getElementById("memberFormDialog").close();
 
     // Fly to new member location
     map.flyTo([latitude, longitude]);

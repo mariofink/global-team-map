@@ -19,56 +19,6 @@
 
       <div class="content">
         <div class="sidebar">
-          <div class="add-member-form">
-            <h2>Add Team Member</h2>
-            <form id="memberForm">
-              <div class="form-group">
-                <label for="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  required
-                  placeholder="Enter name"
-                />
-              </div>
-              <div class="form-group">
-                <label for="role">Role</label>
-                <input
-                  type="text"
-                  id="role"
-                  placeholder="e.g., Developer, Designer"
-                />
-              </div>
-              <div class="form-group">
-                <label for="location">Location</label>
-                <location-search id="locationSearch" required></location-search>
-              </div>
-              <div class="form-group">
-                <label for="latitude">Latitude</label>
-                <input
-                  type="number"
-                  id="latitude"
-                  step="any"
-                  required
-                  placeholder="Auto-filled from location"
-                  readonly
-                />
-              </div>
-              <div class="form-group">
-                <label for="longitude">Longitude</label>
-                <input
-                  type="number"
-                  id="longitude"
-                  step="any"
-                  required
-                  placeholder="Auto-filled from location"
-                  readonly
-                />
-              </div>
-              <button type="submit" class="btn-primary">Add Member</button>
-            </form>
-          </div>
-
           <div class="team-list">
             <div class="share-buttons">
               <button id="exportBtn" class="btn-share" title="Export team data">
@@ -88,6 +38,9 @@
               style="display: none"
             />
             <team-member-list id="memberList"></team-member-list>
+            <button id="openFormBtn" class="btn-add-member">
+              + Add Team Member
+            </button>
           </div>
         </div>
 
@@ -96,6 +49,58 @@
         </div>
       </div>
     </div>
+
+    <dialog id="memberFormDialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2>Add Team Member</h2>
+          <button id="closeDialogBtn" class="btn-close" aria-label="Close">
+            ✕
+          </button>
+        </div>
+        <form id="memberForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" required placeholder="Enter name" />
+          </div>
+          <div class="form-group">
+            <label for="role">Role</label>
+            <input
+              type="text"
+              id="role"
+              placeholder="e.g., Developer, Designer"
+            />
+          </div>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <location-search id="locationSearch" required></location-search>
+          </div>
+          <div class="form-group">
+            <label for="latitude">Latitude</label>
+            <input
+              type="number"
+              id="latitude"
+              step="any"
+              required
+              placeholder="Auto-filled from location"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="longitude">Longitude</label>
+            <input
+              type="number"
+              id="longitude"
+              step="any"
+              required
+              placeholder="Auto-filled from location"
+              readonly
+            />
+          </div>
+          <button type="submit" class="btn-primary">Add Member</button>
+        </form>
+      </div>
+    </dialog>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="app.js"></script>
