@@ -237,13 +237,14 @@ class GlobalTeamApp {
 
   async fetchTimezone(memberId, latitude, longitude) {
     try {
+      // Use timeapi.io to get timezone information
       const response = await fetch(
-        `https://api.wheretheiss.at/v1/coordinates/${latitude},${longitude}`
+        `https://timeapi.io/api/TimeZone/coordinate?latitude=${latitude}&longitude=${longitude}`
       );
       const data = await response.json();
 
-      if (data.timezone_id) {
-        this.memberManager.updateTimezone(memberId, data.timezone_id);
+      if (data.timeZone) {
+        this.memberManager.updateTimezone(memberId, data.timeZone);
         this.startTimeUpdates();
       }
     } catch (error) {
