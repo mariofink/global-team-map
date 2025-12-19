@@ -152,6 +152,7 @@ export class TeamMemberList extends HTMLElement {
           this._members.length === 0
             ? '<p class="empty-message">No team members yet. Add your first member!</p>'
             : this._members
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map((member) => this.renderMemberCard(member))
                 .join("")
         }
