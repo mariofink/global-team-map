@@ -339,6 +339,12 @@ header p {
   font-size: 0.9em;
 }
 
+.local-time {
+  font-weight: 700;
+  color: #667eea;
+  font-family: "Courier New", monospace;
+}
+
 @media (max-width: 768px) {
   .content {
     flex-direction: column;

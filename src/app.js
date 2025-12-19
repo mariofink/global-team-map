@@ -5,6 +5,7 @@ class GlobalTeamApp {
     this.map = null;
     this.markers = {};
     this.searchTimeout = null;
+    this.timeUpdateInterval = null;
     this.init();
   }
 
@@ -13,6 +14,7 @@ class GlobalTeamApp {
     this.initEventListeners();
     this.renderMembers();
     this.updateMap();
+    this.startTimeUpdates();
   }
 
   initMap() {
@@ -92,6 +94,7 @@ class GlobalTeamApp {
       location,
       latitude,
       longitude,
+      timezone: "Loading...",
     };
 
     this.members.push(member);
@@ -106,6 +109,9 @@ class GlobalTeamApp {
     this.map.flyTo([latitude, longitude], 6, {
       duration: 1.5,
     });
+
+    // Fetch timezone asynchronously
+    this.fetchTimezone(member.id, latitude, longitude);
   }
 
   deleteMember(id) {
@@ -181,6 +187,16 @@ class GlobalTeamApp {
                         <p><strong>Location:</strong> ${this.escapeHtml(
                           member.location
                         )}</p>
+                        <p><strong>Timezone:</strong> ${
+                          member.timezone || "Unknown"
+                        }</p>
+                        ${
+                          member.timezone &&
+                          member.timezone !== "Loading..." &&
+                          member.timezone !== "Unknown"
+                            ? `<p><strong>Local Time:</strong> <span class="local-time" data-timezone="${member.timezone}"></span></p>`
+                            : ""
+                        }
                         <p><strong>Coordinates:</strong> ${member.latitude.toFixed(
                           4
                         )}, ${member.longitude.toFixed(4)}</p>
@@ -415,7 +431,7 @@ class GlobalTeamApp {
 
       // Add click handlers to suggestions
       suggestionsDiv.querySelectorAll(".suggestion-item").forEach((item) => {
-        item.addEventListener("click", () => {
+        item.addEventListener("click", async () => {
           const lat = item.dataset.lat;
           const lon = item.dataset.lon;
           const name = item.dataset.name;
@@ -435,6 +451,67 @@ class GlobalTeamApp {
         '<div class="suggestion-item error">Error searching locations</div>';
       console.error("Location search error:", error);
     }
+  }
+
+  async fetchTimezone(memberId, latitude, longitude) {
+    try {
+      const response = await fetch(
+        `https://api.wheretheiss.at/v1/coordinates/${latitude},${longitude}`
+      );
+      const data = await response.json();
+
+      if (data.timezone_id) {
+        const member = this.members.find((m) => m.id === memberId);
+        if (member) {
+          member.timezone = data.timezone_id;
+          this.saveMembers();
+          this.updateMap();
+          this.startTimeUpdates();
+        }
+      }
+    } catch (error) {
+      console.error("Timezone fetch error:", error);
+      const member = this.members.find((m) => m.id === memberId);
+      if (member) {
+        member.timezone = "Unknown";
+        this.saveMembers();
+        this.updateMap();
+      }
+    }
+  }
+
+  startTimeUpdates() {
+    // Update local times every second
+    if (this.timeUpdateInterval) {
+      clearInterval(this.timeUpdateInterval);
+    }
+
+    this.updateLocalTimes();
+    this.timeUpdateInterval = setInterval(() => {
+      this.updateLocalTimes();
+    }, 1000);
+  }
+
+  updateLocalTimes() {
+    const timeElements = document.querySelectorAll(".local-time");
+    timeElements.forEach((el) => {
+      const timezone = el.dataset.timezone;
+      if (timezone) {
+        try {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString("en-US", {
+            timeZone: timezone,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          });
+          el.textContent = timeStr;
+        } catch (error) {
+          el.textContent = "Invalid timezone";
+        }
+      }
+    });
   }
 }
 
