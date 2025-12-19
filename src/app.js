@@ -1,7 +1,7 @@
 import map from "./map.js";
-import { escapeHtml } from "./helpers.js";
 import { TeamMemberManager } from "./TeamMemberManager.js";
 import "./LocationSearch.js"; // Import to register the custom element
+import "./TeamMemberList.js"; // Import to register the custom element
 
 // Global Team Map Application
 class GlobalTeamApp {
@@ -15,16 +15,21 @@ class GlobalTeamApp {
   init() {
     map.init();
     this.initEventListeners();
-    
+
     // Set up callback for member changes
     this.memberManager.setOnMembersChange(() => {
-      this.memberManager.renderMembers();
+      this.updateMemberList();
       this.updateMap();
     });
-    
-    this.memberManager.renderMembers();
+
+    this.updateMemberList();
     this.updateMap();
     this.startTimeUpdates();
+  }
+
+  updateMemberList() {
+    const memberList = document.getElementById("memberList");
+    memberList.members = this.memberManager.getMembers();
   }
 
   updateMap() {
@@ -51,7 +56,17 @@ class GlobalTeamApp {
     locationSearch.addEventListener("location-selected", (e) => {
       this.selectedLocation = e.detail;
       document.getElementById("latitude").value = e.detail.latitude.toFixed(6);
-      document.getElementById("longitude").value = e.detail.longitude.toFixed(6);
+      document.getElementById("longitude").value =
+        e.detail.longitude.toFixed(6);
+    });
+
+    // Listen for member list events
+    const memberList = document.getElementById("memberList");
+    memberList.addEventListener("member-click", (e) => {
+      this.flyToMember(e.detail.memberId);
+    });
+    memberList.addEventListener("member-delete", (e) => {
+      this.deleteMember(e.detail.memberId);
     });
   }
 
@@ -219,8 +234,6 @@ class GlobalTeamApp {
       setTimeout(() => document.body.removeChild(notification), 300);
     }, 3000);
   }
-
-
 
   async fetchTimezone(memberId, latitude, longitude) {
     try {

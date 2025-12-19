@@ -2,7 +2,7 @@ import { escapeHtml } from "./helpers.js";
 
 /**
  * TeamMemberManager handles all team member related operations
- * including CRUD operations, storage, and rendering
+ * including CRUD operations and storage (no rendering)
  */
 export class TeamMemberManager {
   constructor() {
@@ -88,51 +88,6 @@ export class TeamMemberManager {
     this.members = newMembers;
     this.saveMembers();
     this.notifyChange();
-  }
-
-  /**
-   * Render members list in the DOM
-   */
-  renderMembers() {
-    const membersList = document.getElementById("membersList");
-    const memberCount = document.getElementById("memberCount");
-
-    memberCount.textContent = this.members.length;
-
-    if (this.members.length === 0) {
-      membersList.innerHTML =
-        '<p style="color: #999; text-align: center; padding: 20px;">No team members yet. Add your first member!</p>';
-      return;
-    }
-
-    membersList.innerHTML = this.members
-      .map(
-        (member) => `
-            <div class="member-card" onclick="app.flyToMember('${member.id}')">
-                <div class="member-card-header">
-                    <div>
-                        <div class="member-name">${escapeHtml(
-                          member.name
-                        )}</div>
-                        ${
-                          member.role
-                            ? `<div class="member-role">${escapeHtml(
-                                member.role
-                              )}</div>`
-                            : ""
-                        }
-                    </div>
-                    <button class="delete-btn" onclick="event.stopPropagation(); app.deleteMember('${
-                      member.id
-                    }')">Remove</button>
-                </div>
-                <div class="member-location">${escapeHtml(
-                  member.location
-                )}</div>
-            </div>
-        `
-      )
-      .join("");
   }
 
   /**
