@@ -1,18 +1,20 @@
 import map from "./map.js";
 import { escapeHtml } from "./helpers.js";
 import { TeamMemberManager } from "./TeamMemberManager.js";
+import { LocationSearch } from "./LocationSearch.js";
 
 // Global Team Map Application
 class GlobalTeamApp {
   constructor() {
     this.memberManager = new TeamMemberManager();
-    this.searchTimeout = null;
+    this.locationSearch = new LocationSearch();
     this.timeUpdateInterval = null;
     this.init();
   }
 
   init() {
     map.init();
+    this.locationSearch.init();
     this.initEventListeners();
     
     // Set up callback for member changes
@@ -44,24 +46,6 @@ class GlobalTeamApp {
 
     const copyBtn = document.getElementById("copyBtn");
     copyBtn.addEventListener("click", () => this.handleCopy());
-
-    // Location search
-    const locationInput = document.getElementById("location");
-    locationInput.addEventListener("input", (e) =>
-      this.handleLocationSearch(e)
-    );
-    locationInput.addEventListener("focus", () => {
-      if (locationInput.value.length > 2) {
-        document.getElementById("locationSuggestions").style.display = "block";
-      }
-    });
-
-    // Close suggestions when clicking outside
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest(".location-search-wrapper")) {
-        document.getElementById("locationSuggestions").style.display = "none";
-      }
-    });
   }
 
   handleAddMember(e) {
@@ -226,79 +210,7 @@ class GlobalTeamApp {
     }, 3000);
   }
 
-  handleLocationSearch(event) {
-    const query = event.target.value.trim();
-    const suggestionsDiv = document.getElementById("locationSuggestions");
 
-    if (query.length < 3) {
-      suggestionsDiv.style.display = "none";
-      return;
-    }
-
-    // Debounce the search
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => {
-      this.searchLocation(query);
-    }, 300);
-  }
-
-  async searchLocation(query) {
-    const suggestionsDiv = document.getElementById("locationSuggestions");
-    suggestionsDiv.innerHTML =
-      '<div class="suggestion-loading">Searching...</div>';
-    suggestionsDiv.style.display = "block";
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )}&limit=5`
-      );
-      const results = await response.json();
-
-      if (results.length === 0) {
-        suggestionsDiv.innerHTML =
-          '<div class="suggestion-item no-results">No locations found</div>';
-        return;
-      }
-
-      suggestionsDiv.innerHTML = results
-        .map(
-          (result) => `
-          <div class="suggestion-item" data-lat="${result.lat}" data-lon="${
-            result.lon
-          }" data-name="${escapeHtml(result.display_name)}">
-            <div class="suggestion-name">${escapeHtml(
-              result.display_name
-            )}</div>
-          </div>
-        `
-        )
-        .join("");
-
-      // Add click handlers to suggestions
-      suggestionsDiv.querySelectorAll(".suggestion-item").forEach((item) => {
-        item.addEventListener("click", async () => {
-          const lat = item.dataset.lat;
-          const lon = item.dataset.lon;
-          const name = item.dataset.name;
-
-          if (lat && lon) {
-            document.getElementById("location").value = name;
-            document.getElementById("latitude").value =
-              parseFloat(lat).toFixed(6);
-            document.getElementById("longitude").value =
-              parseFloat(lon).toFixed(6);
-            suggestionsDiv.style.display = "none";
-          }
-        });
-      });
-    } catch (error) {
-      suggestionsDiv.innerHTML =
-        '<div class="suggestion-item error">Error searching locations</div>';
-      console.error("Location search error:", error);
-    }
-  }
 
   async fetchTimezone(memberId, latitude, longitude) {
     try {
