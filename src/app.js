@@ -86,6 +86,7 @@ class GlobalTeamApp {
     const location = locationSearch.getValue().trim();
     const latitude = parseFloat(document.getElementById("latitude").value);
     const longitude = parseFloat(document.getElementById("longitude").value);
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     // Validate coordinates
     if (isNaN(latitude) || isNaN(longitude)) {
@@ -102,6 +103,12 @@ class GlobalTeamApp {
       alert("Longitude must be between -180 and 180");
       return;
     }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Adding member...";
+    submitBtn.classList.add("loading");
 
     fetchTimezone(latitude, longitude)
       .then((timezone) => {
@@ -125,6 +132,12 @@ class GlobalTeamApp {
       })
       .catch(() => {
         alert("Failed to fetch timezone for new member");
+      })
+      .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        submitBtn.classList.remove("loading");
       });
   }
 
