@@ -7,7 +7,6 @@ import "./TeamMemberList.js"; // Import to register the custom element
 class GlobalTeamApp {
   constructor() {
     this.memberManager = new TeamMemberManager();
-    this.timeUpdateInterval = null;
     this.selectedLocation = null;
     this.init();
   }
@@ -24,7 +23,6 @@ class GlobalTeamApp {
 
     this.updateMemberList();
     this.updateMap();
-    this.startTimeUpdates();
   }
 
   updateMemberList() {
@@ -245,7 +243,6 @@ class GlobalTeamApp {
 
       if (data.timeZone) {
         this.memberManager.updateTimezone(memberId, data.timeZone);
-        this.startTimeUpdates();
       }
     } catch (error) {
       console.error("Timezone fetch error:", error);
@@ -253,39 +250,6 @@ class GlobalTeamApp {
     }
   }
 
-  startTimeUpdates() {
-    // Update local times every second
-    if (this.timeUpdateInterval) {
-      clearInterval(this.timeUpdateInterval);
-    }
-
-    this.updateLocalTimes();
-    this.timeUpdateInterval = setInterval(() => {
-      this.updateLocalTimes();
-    }, 1000);
-  }
-
-  updateLocalTimes() {
-    const timeElements = document.querySelectorAll(".local-time");
-    timeElements.forEach((el) => {
-      const timezone = el.dataset.timezone;
-      if (timezone) {
-        try {
-          const now = new Date();
-          const timeStr = now.toLocaleTimeString("en-US", {
-            timeZone: timezone,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-          });
-          el.textContent = timeStr;
-        } catch (error) {
-          el.textContent = "Invalid timezone";
-        }
-      }
-    });
-  }
 }
 
 // Initialize app when DOM is ready

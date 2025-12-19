@@ -3,6 +3,21 @@ import { escapeHtml } from "./helpers.js";
 let map;
 let markers = {};
 
+const getLocalTime = (timezone) => {
+  try {
+    const now = new Date();
+    return now.toLocaleTimeString("en-US", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  } catch (error) {
+    return "Invalid timezone";
+  }
+};
+
 const init = () => {
   // Initialize Leaflet map
   map = L.map("map").setView([20, 0], 2);
@@ -42,7 +57,9 @@ const updateMap = (members) => {
                           member.timezone &&
                           member.timezone !== "Loading..." &&
                           member.timezone !== "Unknown"
-                            ? `<p><strong>Local Time:</strong> <span class="local-time" data-timezone="${member.timezone}"></span></p>`
+                            ? `<p><strong>Local Time:</strong> ${getLocalTime(
+                                member.timezone
+                              )}</p>`
                             : ""
                         }
                         <p><strong>Coordinates:</strong> ${member.latitude.toFixed(
