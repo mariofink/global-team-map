@@ -103,18 +103,17 @@ class GlobalTeamApp {
       return;
     }
 
-    const member = this.memberManager.addMember({
-      name,
-      role,
-      location,
-      latitude,
-      longitude,
-    });
-
     fetchTimezone(latitude, longitude)
       .then((timezone) => {
         if (timezone) {
-          this.memberManager.updateTimezone(member, timezone);
+          this.memberManager.addMember({
+            name,
+            role,
+            location,
+            latitude,
+            longitude,
+            timezone,
+          });
           // Reset form
           e.target.reset();
           locationSearch.clear();

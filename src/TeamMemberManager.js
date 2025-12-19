@@ -28,7 +28,7 @@ export class TeamMemberManager {
       location: memberData.location,
       latitude: memberData.latitude,
       longitude: memberData.longitude,
-      timezone: "Loading...",
+      timezone: memberData.timezone,
     };
 
     this.members.push(member);
@@ -52,17 +52,6 @@ export class TeamMemberManager {
    */
   findMember(id) {
     return this.members.find((m) => m.id === id);
-  }
-
-  /**
-   * Update a member's timezone
-   */
-  updateTimezone(member, timezone) {
-    if (member) {
-      member.timezone = timezone;
-      this.saveMembers();
-      this.notifyChange();
-    }
   }
 
   /**
