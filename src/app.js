@@ -42,7 +42,7 @@ class GlobalTeamApp {
 
     openFormBtn.addEventListener("click", () => dialog.showModal());
     closeDialogBtn.addEventListener("click", () => dialog.close());
-    
+
     form.addEventListener("submit", (e) => this.handleAddMember(e));
 
     const exportBtn = document.getElementById("exportBtn");
@@ -189,44 +189,17 @@ class GlobalTeamApp {
   handleCopy() {
     try {
       const dataStr = this.memberManager.exportToJSON();
-
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard
-          .writeText(dataStr)
-          .then(() => {
-            this.showNotification(
-              "Team data copied to clipboard! Paste it to share.",
-              "success"
-            );
-          })
-          .catch(() => {
-            this.fallbackCopyToClipboard(dataStr);
-          });
-      } else {
-        this.fallbackCopyToClipboard(dataStr);
+        navigator.clipboard.writeText(dataStr).then(() => {
+          this.showNotification(
+            "Team data copied to clipboard! Paste it to share.",
+            "success"
+          );
+        });
       }
     } catch (error) {
       alert(error.message);
     }
-  }
-
-  fallbackCopyToClipboard(text) {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand("copy");
-      this.showNotification(
-        "Team data copied to clipboard! Paste it to share.",
-        "success"
-      );
-    } catch (err) {
-      prompt("Copy this data to share:", text);
-    }
-    document.body.removeChild(textarea);
   }
 
   showNotification(message, type = "success") {
@@ -259,7 +232,6 @@ class GlobalTeamApp {
       this.memberManager.updateTimezone(memberId, "Unknown");
     }
   }
-
 }
 
 // Initialize app when DOM is ready
