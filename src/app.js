@@ -1,10 +1,11 @@
 import map from "./map.js";
 import { escapeHtml } from "./helpers.js";
+import { TeamMemberManager } from "./TeamMemberManager.js";
 
 // Global Team Map Application
 class GlobalTeamApp {
   constructor() {
-    this.members = this.loadMembers();
+    this.memberManager = new TeamMemberManager();
     this.searchTimeout = null;
     this.timeUpdateInterval = null;
     this.init();
@@ -13,13 +14,20 @@ class GlobalTeamApp {
   init() {
     map.init();
     this.initEventListeners();
-    this.renderMembers();
+    
+    // Set up callback for member changes
+    this.memberManager.setOnMembersChange(() => {
+      this.memberManager.renderMembers();
+      this.updateMap();
+    });
+    
+    this.memberManager.renderMembers();
     this.updateMap();
     this.startTimeUpdates();
   }
 
   updateMap() {
-    map.updateMap(this.members);
+    map.updateMap(this.memberManager.getMembers());
   }
 
   initEventListeners() {
@@ -81,20 +89,13 @@ class GlobalTeamApp {
       return;
     }
 
-    const member = {
-      id: Date.now().toString(),
+    const member = this.memberManager.addMember({
       name,
       role,
       location,
       latitude,
       longitude,
-      timezone: "Loading...",
-    };
-
-    this.members.push(member);
-    this.saveMembers();
-    this.renderMembers();
-    this.updateMap();
+    });
 
     // Reset form
     e.target.reset();
@@ -108,96 +109,28 @@ class GlobalTeamApp {
 
   deleteMember(id) {
     if (confirm("Are you sure you want to remove this team member?")) {
-      this.members = this.members.filter((m) => m.id !== id);
-      this.saveMembers();
-      this.renderMembers();
-      this.updateMap();
+      this.memberManager.deleteMember(id);
     }
-  }
-
-  renderMembers() {
-    const membersList = document.getElementById("membersList");
-    const memberCount = document.getElementById("memberCount");
-
-    memberCount.textContent = this.members.length;
-
-    if (this.members.length === 0) {
-      membersList.innerHTML =
-        '<p style="color: #999; text-align: center; padding: 20px;">No team members yet. Add your first member!</p>';
-      return;
-    }
-
-    membersList.innerHTML = this.members
-      .map(
-        (member) => `
-            <div class="member-card" onclick="app.flyToMember('${member.id}')">
-                <div class="member-card-header">
-                    <div>
-                        <div class="member-name">${escapeHtml(
-                          member.name
-                        )}</div>
-                        ${
-                          member.role
-                            ? `<div class="member-role">${escapeHtml(
-                                member.role
-                              )}</div>`
-                            : ""
-                        }
-                    </div>
-                    <button class="delete-btn" onclick="event.stopPropagation(); app.deleteMember('${
-                      member.id
-                    }')">Remove</button>
-                </div>
-                <div class="member-location">${escapeHtml(
-                  member.location
-                )}</div>
-            </div>
-        `
-      )
-      .join("");
   }
 
   flyToMember(id) {
-    const member = this.members.find((m) => m.id === id);
+    const member = this.memberManager.findMember(id);
     if (member) {
       map.flyTo([member.latitude, member.longitude]);
       map.openPopup(id);
     }
   }
 
-  saveMembers() {
-    localStorage.setItem("globalTeamMembers", JSON.stringify(this.members));
-  }
-
-  loadMembers() {
-    const stored = localStorage.getItem("globalTeamMembers");
-    return stored ? JSON.parse(stored) : [];
-  }
-
   handleExport() {
-    if (this.members.length === 0) {
-      alert("No team members to export!");
-      return;
+    try {
+      this.memberManager.exportToFile();
+      this.showNotification(
+        "Team data exported! Share the file with others.",
+        "success"
+      );
+    } catch (error) {
+      alert(error.message);
     }
-
-    const dataStr = JSON.stringify(this.members, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `global-team-${
-      new Date().toISOString().split("T")[0]
-    }.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    this.showNotification(
-      "Team data exported! Share the file with others.",
-      "success"
-    );
   }
 
   handleImport(event) {
@@ -207,29 +140,13 @@ class GlobalTeamApp {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const imported = JSON.parse(e.target.result);
-
-        if (!Array.isArray(imported)) {
-          throw new Error("Invalid file format");
-        }
-
-        // Validate structure
-        const isValid = imported.every(
-          (m) =>
-            m.name &&
-            m.location &&
-            typeof m.latitude === "number" &&
-            typeof m.longitude === "number"
-        );
-
-        if (!isValid) {
-          throw new Error("Invalid team data structure");
-        }
+        const imported = this.memberManager.importFromJSON(e.target.result);
 
         // Ask for confirmation if there's existing data
-        if (this.members.length > 0) {
+        const currentMembers = this.memberManager.getMembers();
+        if (currentMembers.length > 0) {
           const replace = confirm(
-            `You have ${this.members.length} existing team member(s). Replace with ${imported.length} imported member(s)?`
+            `You have ${currentMembers.length} existing team member(s). Replace with ${imported.length} imported member(s)?`
           );
           if (!replace) {
             event.target.value = ""; // Reset file input
@@ -237,10 +154,7 @@ class GlobalTeamApp {
           }
         }
 
-        this.members = imported;
-        this.saveMembers();
-        this.renderMembers();
-        this.updateMap();
+        this.memberManager.replaceMembers(imported);
 
         this.showNotification(
           `Successfully imported ${imported.length} team member(s)!`,
@@ -256,27 +170,26 @@ class GlobalTeamApp {
   }
 
   handleCopy() {
-    if (this.members.length === 0) {
-      alert("No team members to copy!");
-      return;
-    }
+    try {
+      const dataStr = this.memberManager.exportToJSON();
 
-    const dataStr = JSON.stringify(this.members, null, 2);
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard
-        .writeText(dataStr)
-        .then(() => {
-          this.showNotification(
-            "Team data copied to clipboard! Paste it to share.",
-            "success"
-          );
-        })
-        .catch(() => {
-          this.fallbackCopyToClipboard(dataStr);
-        });
-    } else {
-      this.fallbackCopyToClipboard(dataStr);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(dataStr)
+          .then(() => {
+            this.showNotification(
+              "Team data copied to clipboard! Paste it to share.",
+              "success"
+            );
+          })
+          .catch(() => {
+            this.fallbackCopyToClipboard(dataStr);
+          });
+      } else {
+        this.fallbackCopyToClipboard(dataStr);
+      }
+    } catch (error) {
+      alert(error.message);
     }
   }
 
@@ -395,22 +308,12 @@ class GlobalTeamApp {
       const data = await response.json();
 
       if (data.timezone_id) {
-        const member = this.members.find((m) => m.id === memberId);
-        if (member) {
-          member.timezone = data.timezone_id;
-          this.saveMembers();
-          this.updateMap();
-          this.startTimeUpdates();
-        }
+        this.memberManager.updateTimezone(memberId, data.timezone_id);
+        this.startTimeUpdates();
       }
     } catch (error) {
       console.error("Timezone fetch error:", error);
-      const member = this.members.find((m) => m.id === memberId);
-      if (member) {
-        member.timezone = "Unknown";
-        this.saveMembers();
-        this.updateMap();
-      }
+      this.memberManager.updateTimezone(memberId, "Unknown");
     }
   }
 
