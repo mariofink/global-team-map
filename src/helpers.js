@@ -7,15 +7,15 @@ const escapeHtml = (text) => {
 const fetchTimezone = async (latitude, longitude) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Use timeapi.io to get timezone information
+      // Use WhereTheISS API to get timezone information
       const response = await fetch(
-        `https://timeapi.io/api/TimeZone/coordinate?latitude=${latitude}&longitude=${longitude}`
+        `https://api.wheretheiss.at/v1/coordinates/${latitude},${longitude}`
       );
       const data = await response.json();
 
       console.log("Timezone data:", data);
-      if (data.timeZone) {
-        resolve(data.timeZone);
+      if (data.timezone_id) {
+        resolve(data.timezone_id);
       }
     } catch (error) {
       console.error("Timezone fetch error:", error);

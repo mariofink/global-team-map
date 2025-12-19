@@ -897,4 +897,80 @@ Using "Replace String in File"
 
 The dialog is now centered both horizontally and vertically on the screen using `position: fixed` with `top: 50%` and `left: 50%`, combined with a transform to offset it by half its own dimensions.
 
+User: Explain why the function fallbackCopyToClipboard is required?
+
+GitHub Copilot: Searched for text `fallbackCopyToClipboard`, 3 results
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/app.js#195-195), lines 195 to 230
+
+The `fallbackCopyToClipboard` function is required because the modern Clipboard API (`navigator.clipboard.writeText()`) isn't universally supported across all browsers and contexts:
+
+1. **Browser compatibility**: Older browsers don't support the Clipboard API
+2. **HTTPS requirement**: The Clipboard API only works in secure contexts (HTTPS), not on HTTP
+3. **Permission issues**: Some browsers may block clipboard access even when the API exists
+
+The fallback uses the older `document.execCommand('copy')` method with a temporary textarea element, which has broader browser support. If even that fails, it shows a `prompt()` dialog with the text so users can manually copy it.
+
+The code checks: `if (navigator.clipboard)` first, and if that fails (line 203) or doesn't exist (line 206), it calls the fallback to ensure clipboard functionality works across all environments.
+
+User: Would it make sense to use the HTML dialog element for the notifications, using the popover attribute maybe?
+
+GitHub Copilot: Searched for text `showNotification`, 4 results
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/app.js#225-225), lines 225 to 241
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/app.js#225-225), lines 225 to 241
+
+Searched for regex `showNotification\(.*\{`, 1 result
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/app.js#205-205), lines 205 to 225
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/styles.css#1-1), lines 1 to 50
+
+Searched for text `.notification` (`**/src/styles.css`), 4 results
+
+Read [](file:///Users/neif461/Developer/mariofink/globalteam/src/styles.css#183-183), lines 183 to 215
+
+For this use case, **I'd recommend against using `<dialog>` with `popover`**. Here's why:
+
+**Current approach (custom div notifications) is better because:**
+
+1. **Auto-dismiss**: Your notifications auto-dismiss after 3 seconds. Popovers require manual interaction to close, and dialogs are meant for user interaction/decisions.
+
+2. **Multiple notifications**: You can show multiple notifications stacked. Dialogs typically expect one at a time and block interaction.
+
+3. **Non-blocking**: Your notifications don't interrupt user workflow. Dialogs, by design, demand attention and often trap focus.
+
+4. **Toast pattern**: You're implementing a "toast notification" pattern - brief, informational feedback that appears and disappears automatically. This matches your current implementation perfectly.
+
+**When `<dialog>` or `popover` would make sense:**
+
+- **Dialog**: For confirmations, forms, or actions requiring user response (e.g., "Are you sure you want to delete this member?")
+- **Popover**: For temporary tips, menus, or contextual content anchored to an element (e.g., a timezone explanation tooltip)
+
+Your current notification system is semantically correct and appropriate for its purpose. If you want to enhance it, consider adding ARIA live regions for accessibility:
+
+```javascript
+notification.setAttribute("role", "status");
+notification.setAttribute("aria-live", "polite");
+```
+
+User: The timeapi.io endpoint is very flaky. Could you revert back to using the ISS one?
+
+GitHub Copilot: Searched for text `ISS`, 9 results
+
+Searched for regex `timezonedb|worldtime|geonames|timezone`, 20 results
+
+Read changed files in [](file:///Users/neif461/Developer/mariofink/globalteam)
+
+Based on the VIBE.md file, the previous implementation used the WhereTheISS API at `wheretheiss.at`. Let me update the code to use that endpoint:
+
+Using "Replace String in File"
+
+```
+
+```
+
+Done! I've reverted back to the WhereTheISS API at `api.wheretheiss.at`, which uses `timezone_id` instead of `timeZone` for the property name.
+
 Made changes.
