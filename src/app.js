@@ -1,5 +1,7 @@
 import map from "./map.js";
 import { TeamMemberManager } from "./TeamMemberManager.js";
+import { fetchTimezone } from "./helpers.js";
+
 import "./LocationSearch.js"; // Import to register the custom element
 import "./TeamMemberList.js"; // Import to register the custom element
 
@@ -109,19 +111,22 @@ class GlobalTeamApp {
       longitude,
     });
 
-    // Reset form
-    e.target.reset();
-    locationSearch.clear();
-    this.selectedLocation = null;
+    fetchTimezone(latitude, longitude)
+      .then((timezone) => {
+        if (timezone) {
+          this.memberManager.updateTimezone(member, timezone);
+          // Reset form
+          e.target.reset();
+          locationSearch.clear();
+          this.selectedLocation = null;
 
-    // Close the dialog
-    document.getElementById("memberFormDialog").close();
-
-    // Fly to new member location
-    map.flyTo([latitude, longitude]);
-
-    // Fetch timezone asynchronously
-    this.fetchTimezone(member.id, latitude, longitude);
+          document.getElementById("memberFormDialog").close();
+          map.flyTo([latitude, longitude]);
+        }
+      })
+      .catch(() => {
+        alert("Failed to fetch timezone for new member");
+      });
   }
 
   deleteMember(id) {
@@ -214,23 +219,6 @@ class GlobalTeamApp {
       notification.classList.remove("show");
       setTimeout(() => document.body.removeChild(notification), 300);
     }, 3000);
-  }
-
-  async fetchTimezone(memberId, latitude, longitude) {
-    try {
-      // Use timeapi.io to get timezone information
-      const response = await fetch(
-        `https://timeapi.io/api/TimeZone/coordinate?latitude=${latitude}&longitude=${longitude}`
-      );
-      const data = await response.json();
-
-      if (data.timeZone) {
-        this.memberManager.updateTimezone(memberId, data.timeZone);
-      }
-    } catch (error) {
-      console.error("Timezone fetch error:", error);
-      this.memberManager.updateTimezone(memberId, "Unknown");
-    }
   }
 }
 

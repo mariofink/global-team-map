@@ -57,8 +57,7 @@ export class TeamMemberManager {
   /**
    * Update a member's timezone
    */
-  updateTimezone(memberId, timezone) {
-    const member = this.findMember(memberId);
+  updateTimezone(member, timezone) {
     if (member) {
       member.timezone = timezone;
       this.saveMembers();
