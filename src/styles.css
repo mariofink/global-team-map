@@ -95,60 +95,6 @@ header p {
   cursor: not-allowed;
 }
 
-.location-search-wrapper {
-  position: relative;
-}
-
-.location-suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 2px solid #667eea;
-  border-top: none;
-  border-radius: 0 0 6px 6px;
-  max-height: 250px;
-  overflow-y: auto;
-  z-index: 100;
-  display: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.suggestion-item {
-  padding: 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
-}
-
-.suggestion-item:last-child {
-  border-bottom: none;
-}
-
-.suggestion-item:hover {
-  background: #f8f9fa;
-}
-
-.suggestion-item.no-results,
-.suggestion-item.error {
-  cursor: default;
-  color: #999;
-  text-align: center;
-}
-
-.suggestion-loading {
-  padding: 12px;
-  text-align: center;
-  color: #667eea;
-  font-weight: 600;
-}
-
-.suggestion-name {
-  font-size: 0.9em;
-  color: #333;
-}
-
 .btn-primary {
   width: 100%;
   padding: 12px;

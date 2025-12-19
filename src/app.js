@@ -1,20 +1,19 @@
 import map from "./map.js";
 import { escapeHtml } from "./helpers.js";
 import { TeamMemberManager } from "./TeamMemberManager.js";
-import { LocationSearch } from "./LocationSearch.js";
+import "./LocationSearch.js"; // Import to register the custom element
 
 // Global Team Map Application
 class GlobalTeamApp {
   constructor() {
     this.memberManager = new TeamMemberManager();
-    this.locationSearch = new LocationSearch();
     this.timeUpdateInterval = null;
+    this.selectedLocation = null;
     this.init();
   }
 
   init() {
     map.init();
-    this.locationSearch.init();
     this.initEventListeners();
     
     // Set up callback for member changes
@@ -46,6 +45,14 @@ class GlobalTeamApp {
 
     const copyBtn = document.getElementById("copyBtn");
     copyBtn.addEventListener("click", () => this.handleCopy());
+
+    // Listen for location selection from web component
+    const locationSearch = document.getElementById("locationSearch");
+    locationSearch.addEventListener("location-selected", (e) => {
+      this.selectedLocation = e.detail;
+      document.getElementById("latitude").value = e.detail.latitude.toFixed(6);
+      document.getElementById("longitude").value = e.detail.longitude.toFixed(6);
+    });
   }
 
   handleAddMember(e) {
@@ -53,13 +60,14 @@ class GlobalTeamApp {
 
     const name = document.getElementById("name").value.trim();
     const role = document.getElementById("role").value.trim();
-    const location = document.getElementById("location").value.trim();
+    const locationSearch = document.getElementById("locationSearch");
+    const location = locationSearch.getValue().trim();
     const latitude = parseFloat(document.getElementById("latitude").value);
     const longitude = parseFloat(document.getElementById("longitude").value);
 
     // Validate coordinates
     if (isNaN(latitude) || isNaN(longitude)) {
-      alert("Please enter valid latitude and longitude values");
+      alert("Please select a location from the search results");
       return;
     }
 
@@ -83,6 +91,8 @@ class GlobalTeamApp {
 
     // Reset form
     e.target.reset();
+    locationSearch.clear();
+    this.selectedLocation = null;
 
     // Fly to new member location
     map.flyTo([latitude, longitude]);
