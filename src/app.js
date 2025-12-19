@@ -1,31 +1,25 @@
+import map from "./map.js";
+import { escapeHtml } from "./helpers.js";
+
 // Global Team Map Application
 class GlobalTeamApp {
   constructor() {
     this.members = this.loadMembers();
-    this.map = null;
-    this.markers = {};
     this.searchTimeout = null;
     this.timeUpdateInterval = null;
     this.init();
   }
 
   init() {
-    this.initMap();
+    map.init();
     this.initEventListeners();
     this.renderMembers();
     this.updateMap();
     this.startTimeUpdates();
   }
 
-  initMap() {
-    // Initialize Leaflet map
-    this.map = L.map("map").setView([20, 0], 2);
-
-    // Add OpenStreetMap tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors",
-      maxZoom: 18,
-    }).addTo(this.map);
+  updateMap() {
+    map.updateMap(this.members);
   }
 
   initEventListeners() {
@@ -106,9 +100,7 @@ class GlobalTeamApp {
     e.target.reset();
 
     // Fly to new member location
-    this.map.flyTo([latitude, longitude], 6, {
-      duration: 1.5,
-    });
+    map.flyTo([latitude, longitude]);
 
     // Fetch timezone asynchronously
     this.fetchTimezone(member.id, latitude, longitude);
@@ -141,12 +133,12 @@ class GlobalTeamApp {
             <div class="member-card" onclick="app.flyToMember('${member.id}')">
                 <div class="member-card-header">
                     <div>
-                        <div class="member-name">${this.escapeHtml(
+                        <div class="member-name">${escapeHtml(
                           member.name
                         )}</div>
                         ${
                           member.role
-                            ? `<div class="member-role">${this.escapeHtml(
+                            ? `<div class="member-role">${escapeHtml(
                                 member.role
                               )}</div>`
                             : ""
@@ -156,7 +148,7 @@ class GlobalTeamApp {
                       member.id
                     }')">Remove</button>
                 </div>
-                <div class="member-location">${this.escapeHtml(
+                <div class="member-location">${escapeHtml(
                   member.location
                 )}</div>
             </div>
@@ -165,63 +157,11 @@ class GlobalTeamApp {
       .join("");
   }
 
-  updateMap() {
-    // Clear existing markers
-    Object.values(this.markers).forEach((marker) => marker.remove());
-    this.markers = {};
-
-    // Add markers for all members
-    this.members.forEach((member) => {
-      const marker = L.marker([member.latitude, member.longitude]).addTo(
-        this.map
-      ).bindPopup(`
-                    <div class="popup-content">
-                        <h3>${this.escapeHtml(member.name)}</h3>
-                        ${
-                          member.role
-                            ? `<p><strong>Role:</strong> ${this.escapeHtml(
-                                member.role
-                              )}</p>`
-                            : ""
-                        }
-                        <p><strong>Location:</strong> ${this.escapeHtml(
-                          member.location
-                        )}</p>
-                        <p><strong>Timezone:</strong> ${
-                          member.timezone || "Unknown"
-                        }</p>
-                        ${
-                          member.timezone &&
-                          member.timezone !== "Loading..." &&
-                          member.timezone !== "Unknown"
-                            ? `<p><strong>Local Time:</strong> <span class="local-time" data-timezone="${member.timezone}"></span></p>`
-                            : ""
-                        }
-                        <p><strong>Coordinates:</strong> ${member.latitude.toFixed(
-                          4
-                        )}, ${member.longitude.toFixed(4)}</p>
-                    </div>
-                `);
-
-      this.markers[member.id] = marker;
-    });
-
-    // Fit map to show all markers
-    if (this.members.length > 0) {
-      const bounds = L.latLngBounds(
-        this.members.map((m) => [m.latitude, m.longitude])
-      );
-      this.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
-    }
-  }
-
   flyToMember(id) {
     const member = this.members.find((m) => m.id === id);
     if (member) {
-      this.map.flyTo([member.latitude, member.longitude], 8, {
-        duration: 1.5,
-      });
-      this.markers[id].openPopup();
+      map.flyTo([member.latitude, member.longitude]);
+      map.openPopup(id);
     }
   }
 
@@ -232,12 +172,6 @@ class GlobalTeamApp {
   loadMembers() {
     const stored = localStorage.getItem("globalTeamMembers");
     return stored ? JSON.parse(stored) : [];
-  }
-
-  escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 
   handleExport() {
@@ -420,8 +354,8 @@ class GlobalTeamApp {
           (result) => `
           <div class="suggestion-item" data-lat="${result.lat}" data-lon="${
             result.lon
-          }" data-name="${this.escapeHtml(result.display_name)}">
-            <div class="suggestion-name">${this.escapeHtml(
+          }" data-name="${escapeHtml(result.display_name)}">
+            <div class="suggestion-name">${escapeHtml(
               result.display_name
             )}</div>
           </div>
@@ -516,7 +450,6 @@ class GlobalTeamApp {
 }
 
 // Initialize app when DOM is ready
-let app;
 document.addEventListener("DOMContentLoaded", () => {
-  app = new GlobalTeamApp();
+  window.app = new GlobalTeamApp();
 });

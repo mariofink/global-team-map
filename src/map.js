@@ -1,0 +1,76 @@
+import { escapeHtml } from "./helpers.js";
+
+let map;
+let markers = {};
+
+const init = () => {
+  // Initialize Leaflet map
+  map = L.map("map").setView([20, 0], 2);
+  // Add OpenStreetMap tile layer
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+    maxZoom: 18,
+  }).addTo(map);
+};
+
+const updateMap = (members) => {
+  if (!map) return;
+  // Clear existing markers
+  Object.values(markers).forEach((marker) => marker.remove());
+  markers = {};
+
+  // Add markers for all members
+  members.forEach((member) => {
+    const marker = L.marker([member.latitude, member.longitude]).addTo(map)
+      .bindPopup(`
+                    <div class="popup-content">
+                        <h3>${escapeHtml(member.name)}</h3>
+                        ${
+                          member.role
+                            ? `<p><strong>Role:</strong> ${escapeHtml(
+                                member.role
+                              )}</p>`
+                            : ""
+                        }
+                        <p><strong>Location:</strong> ${escapeHtml(
+                          member.location
+                        )}</p>
+                        <p><strong>Timezone:</strong> ${
+                          member.timezone || "Unknown"
+                        }</p>
+                        ${
+                          member.timezone &&
+                          member.timezone !== "Loading..." &&
+                          member.timezone !== "Unknown"
+                            ? `<p><strong>Local Time:</strong> <span class="local-time" data-timezone="${member.timezone}"></span></p>`
+                            : ""
+                        }
+                        <p><strong>Coordinates:</strong> ${member.latitude.toFixed(
+                          4
+                        )}, ${member.longitude.toFixed(4)}</p>
+                    </div>
+                `);
+
+    markers[member.id] = marker;
+  });
+
+  // Fit map to show all markers
+  if (members.length > 0) {
+    const bounds = L.latLngBounds(
+      members.map((m) => [m.latitude, m.longitude])
+    );
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+  }
+};
+
+const flyTo = (latlon) => {
+  map.flyTo(latlon, 6, {
+    duration: 1.5,
+  });
+};
+
+const openPopup = (id) => {
+  markers[id] && markers[id].openPopup();
+};
+
+export default { init, updateMap, flyTo, openPopup };
