@@ -1,0 +1,181 @@
+/* Alpine.js Component Styles */
+
+/* Team List */
+.team-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.team-list .header {
+  margin-bottom: var(--spacing-md);
+}
+
+.team-list .header h2 {
+  font-size: 1.3em;
+  color: var(--color-text);
+}
+
+.empty-state {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+  border: 2px dashed var(--color-border);
+}
+
+.members-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Member Card */
+.member-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  position: relative;
+}
+
+.member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-info h3 {
+  margin: 0;
+  font-size: 1em;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-info .role {
+  margin: 2px 0 0;
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-details {
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+}
+
+.member-details p {
+  margin: 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-details .location {
+  color: var(--color-text);
+}
+
+.delete-btn {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  padding: 4px;
+  line-height: 1;
+}
+
+.member-card:hover .delete-btn {
+  opacity: 0.6;
+}
+
+.delete-btn:hover {
+  opacity: 1 !important;
+}
+
+/* Location Search */
+.location-search-wrapper {
+  position: relative;
+}
+
+.location-input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  transition: border-color var(--transition-base);
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.location-results {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.location-results li {
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  transition: background var(--transition-base);
+  font-size: 0.9em;
+}
+
+.location-results li:hover {
+  background: var(--color-background);
+}
+
+.location-results li:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}

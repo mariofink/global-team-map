@@ -9,8 +9,13 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
     <link rel="stylesheet" href="./styles/index.css" />
+    <script type="module" src="app.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
   </head>
-  <body>
+  <body x-data="app">
     <main>
       <header>
         <h1>🌍 Global Team Map 🌏</h1>
@@ -20,24 +25,86 @@
       <div class="content">
         <div class="sidebar">
           <div class="share-buttons">
-            <button id="exportBtn" class="btn-share" title="Export team data">
+            <button
+              @click="handleExport()"
+              class="btn-share"
+              title="Export team data"
+            >
               📥 Export
             </button>
-            <button id="importBtn" class="btn-share" title="Import team data">
+            <button
+              @click="$refs.fileInput.click()"
+              class="btn-share"
+              title="Import team data"
+            >
               📤 Import
             </button>
-            <button id="copyBtn" class="btn-share" title="Copy team data">
+            <button
+              @click="handleCopy()"
+              class="btn-share"
+              title="Copy team data"
+            >
               📋 Copy
             </button>
           </div>
           <input
+            x-ref="fileInput"
             type="file"
-            id="fileInput"
             accept=".json"
+            @change="handleImport($event)"
             style="display: none"
           />
-          <team-member-list id="memberList"></team-member-list>
-          <button id="openFormBtn" class="btn-add-member">
+          <div class="team-list">
+            <div class="header">
+              <h2>
+                Team Members (<span x-text="members?.length || 0"></span>)
+              </h2>
+            </div>
+
+            <template x-if="!members || members.length === 0">
+              <div class="empty-state">
+                <p>
+                  No team members yet. Add your first member to get started!
+                </p>
+              </div>
+            </template>
+
+            <div class="members-grid">
+              <template x-for="member in members" :key="member.id">
+                <div class="member-card" @click="handleMemberClick(member.id)">
+                  <div class="member-header">
+                    <div
+                      class="member-avatar"
+                      x-text="getInitials(member.name)"
+                    ></div>
+                    <div class="member-info">
+                      <h3 x-text="member.name"></h3>
+                      <p
+                        class="role"
+                        x-text="member.role || 'No role specified'"
+                      ></p>
+                    </div>
+                  </div>
+                  <div class="member-details">
+                    <p class="location">
+                      📍 <span x-text="member.location"></span>
+                    </p>
+                    <p class="timezone">
+                      🕐 <span x-text="member.timezone || 'Unknown'"></span>
+                    </p>
+                  </div>
+                  <button
+                    @click.stop="handleDeleteClick(member.id)"
+                    class="delete-btn"
+                    title="Delete member"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+          <button @click="$refs.dialog.showModal()" class="btn-add-member">
             + Add Team Member
           </button>
         </div>
@@ -48,36 +115,62 @@
       </div>
     </main>
 
-    <dialog id="memberFormDialog">
+    <dialog x-ref="dialog" @close="resetForm()">
       <div class="dialog-content">
         <div class="dialog-header">
           <h2>Add Team Member</h2>
-          <button id="closeDialogBtn" class="btn-close" aria-label="Close">
+          <button
+            @click="$refs.dialog.close()"
+            class="btn-close"
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
-        <form id="memberForm">
+        <form @submit.prevent="handleAddMember($event)">
           <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" id="name" required placeholder="Enter name" />
+            <input
+              type="text"
+              x-model="form.name"
+              required
+              placeholder="Enter name"
+            />
           </div>
           <div class="form-group">
             <label for="role">Role</label>
             <input
               type="text"
-              id="role"
+              x-model="form.role"
               placeholder="e.g., Developer, Designer"
             />
           </div>
           <div class="form-group">
             <label for="location">Location</label>
-            <location-search id="locationSearch" required></location-search>
+            <div x-data="locationSearch" class="location-search-wrapper">
+              <input
+                type="text"
+                x-model="query"
+                @input.debounce.500ms="search()"
+                placeholder="Search for a location..."
+                class="location-input"
+                required
+              />
+              <ul x-show="results.length > 0" class="location-results">
+                <template x-for="result in results" :key="result.place_id">
+                  <li
+                    @click="selectLocation(result)"
+                    x-text="result.display_name"
+                  ></li>
+                </template>
+              </ul>
+            </div>
           </div>
           <div class="form-group">
             <label for="latitude">Latitude</label>
             <input
               type="number"
-              id="latitude"
+              x-model="form.latitude"
               step="any"
               required
               placeholder="Auto-filled from location"
@@ -88,19 +181,24 @@
             <label for="longitude">Longitude</label>
             <input
               type="number"
-              id="longitude"
+              x-model="form.longitude"
               step="any"
               required
               placeholder="Auto-filled from location"
               readonly
             />
           </div>
-          <button type="submit" class="btn-primary">Add Member</button>
+          <button
+            type="submit"
+            class="btn-primary"
+            :disabled="isSubmitting"
+            :class="{ 'loading': isSubmitting }"
+            x-text="isSubmitting ? 'Adding member...' : 'Add Member'"
+          ></button>
         </form>
       </div>
     </dialog>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="module" src="app.js"></script>
   </body>
 </html>
