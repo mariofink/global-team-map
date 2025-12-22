@@ -57,11 +57,11 @@
           <div class="team-list">
             <div class="header">
               <h2>
-                Team Members (<span x-text="members?.length || 0"></span>)
+                Team Members (<span x-text="$store.team.members?.length || 0"></span>)
               </h2>
             </div>
 
-            <template x-if="!members || members.length === 0">
+            <template x-if="!$store.team.members || $store.team.members.length === 0">
               <div class="empty-state">
                 <p>
                   No team members yet. Add your first member to get started!
@@ -70,7 +70,7 @@
             </template>
 
             <div class="members-grid">
-              <template x-for="member in members" :key="member.id">
+              <template x-for="member in $store.team.members" :key="member.id">
                 <div class="member-card" @click="handleMemberClick(member.id)">
                   <div class="member-header">
                     <div
