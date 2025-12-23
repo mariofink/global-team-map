@@ -1,5 +1,3 @@
-import { escapeHtml } from "./helpers.js";
-
 /**
  * TeamMemberManager handles all team member related operations
  * including CRUD operations and storage (no rendering)
