@@ -97,20 +97,20 @@ header {
   border-radius: var(--border-radius-lg);
 }
 
-.popup-content {
+.map-popup-content {
   padding: var(--spacing-sm);
   min-width: 150px;
-}
 
-.popup-content h3 {
-  margin-bottom: var(--spacing-xs);
-  color: var(--color-text);
-}
+  h3 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text);
+  }
 
-.popup-content p {
-  margin: var(--spacing-xs) 0;
-  color: var(--color-text-lighter);
-  font-size: 0.9em;
+  p {
+    margin: var(--spacing-xs) 0;
+    color: var(--color-text-lighter);
+    font-size: 0.9em;
+  }
 }
 
 .local-time {

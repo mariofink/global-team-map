@@ -38,7 +38,7 @@ const updateMap = (members) => {
   members.forEach((member) => {
     const marker = L.marker([member.latitude, member.longitude]).addTo(map)
       .bindPopup(`
-                    <div class="popup-content">
+                    <div class="map-popup-content">
                         <h3>${escapeHtml(member.name)}</h3>
                         ${
                           member.role
