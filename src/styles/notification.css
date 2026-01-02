@@ -1,11 +1,11 @@
 .notification {
   position: fixed;
-  bottom: var(--spacing-xl);
-  right: var(--spacing-xl);
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
   background: var(--color-success);
   color: white;
   padding: 16px 24px;
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   font-weight: 600;
   opacity: 0;

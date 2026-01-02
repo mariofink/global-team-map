@@ -20,7 +20,6 @@
   padding: var(--spacing-lg);
   text-align: center;
   color: var(--color-text-muted);
-  background: var(--color-background);
   border-radius: var(--border-radius);
   border: 2px dashed var(--color-border);
 }
@@ -178,7 +177,7 @@
 }
 
 .location-results li:hover {
-  background: var(--color-background);
+  background: color-mix(in srgb, var(--color-primary) 40%, white);
 }
 
 .location-results li:not(:last-child) {

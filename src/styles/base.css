@@ -11,14 +11,11 @@
   --color-border: #e0e0e0;
   --color-bg-light: #f8f9fa;
   --color-disabled: #9ca3af;
-  --spacing-xs: 5px;
-  --spacing-sm: 10px;
-  --spacing-md: 15px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
   --spacing-lg: 20px;
-  --spacing-xl: 30px;
-  --border-radius: 6px;
-  --border-radius-lg: 8px;
-  --border-radius-xl: 12px;
+  --border-radius: 8px;
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 5px 15px rgba(102, 126, 234, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -52,7 +49,7 @@ main {
 header {
   background: var(--gradient-primary);
   color: white;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-lg);
   text-align: center;
   flex-shrink: 0;
 
@@ -75,7 +72,7 @@ header {
 
 .sidebar {
   width: 350px;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   background: var(--color-bg-light);
   overflow-y: auto;
   border-right: 1px solid var(--color-border);
@@ -94,7 +91,7 @@ header {
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius);
 }
 
 .leaflet-popup-content {
