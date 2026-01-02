@@ -97,9 +97,10 @@ header {
   border-radius: var(--border-radius-lg);
 }
 
-.map-popup-content {
-  padding: var(--spacing-sm);
+.leaflet-popup-content {
+  margin: var(--spacing-md);
   min-width: 150px;
+  font-size: 1rem;
 
   h3 {
     margin-bottom: var(--spacing-xs);
@@ -109,7 +110,6 @@ header {
   p {
     margin: var(--spacing-xs) 0;
     color: var(--color-text-lighter);
-    font-size: 0.9em;
   }
 }
 

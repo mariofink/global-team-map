@@ -47,24 +47,17 @@ const updateMap = (members) => {
                               )}</p>`
                             : ""
                         }
-                        <p><strong>Location:</strong> ${escapeHtml(
+                        <p><strong>📍 </strong> ${escapeHtml(
                           member.location
                         )}</p>
-                        <p><strong>Timezone:</strong> ${
-                          member.timezone || "Unknown"
-                        }</p>
                         ${
-                          member.timezone &&
-                          member.timezone !== "Loading..." &&
-                          member.timezone !== "Unknown"
-                            ? `<p><strong>Local Time:</strong> ${getLocalTime(
-                                member.timezone
-                              )}</p>`
+                          member.timezone
+                            ? `<p><strong>🕐 </strong> 
+                                ${getLocalTime(member.timezone)} 
+                                (${member.timezone || "Unknown"})
+                              </p>`
                             : ""
                         }
-                        <p><strong>Coordinates:</strong> ${member.latitude.toFixed(
-                          4
-                        )}, ${member.longitude.toFixed(4)}</p>
                     </div>
                 `);
 
