@@ -10,6 +10,7 @@ export function createTeamStore() {
   return {
     memberManager: new TeamMemberManager(),
     members: [],
+    selectedMemberId: null,
 
     init() {
       // Load members from storage
@@ -63,9 +64,10 @@ export function createTeamStore() {
       return this.memberManager.findMember(id);
     },
 
-    flyToMember(id) {
+    selectMember(id) {
       const member = this.findMember(id);
       if (member) {
+        this.selectedMemberId = id;
         map.flyTo([member.latitude, member.longitude]);
         map.openPopup(id);
       }

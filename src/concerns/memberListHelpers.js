@@ -12,7 +12,7 @@ export const memberListHelpers = {
   },
 
   handleMemberClick(memberId) {
-    Alpine.store("team").flyToMember(memberId);
+    Alpine.store("team").selectMember(memberId);
   },
 
   handleDeleteClick(memberId) {

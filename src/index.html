@@ -53,7 +53,11 @@
 
             <div class="members-grid">
               <template x-for="member in $store.team.members" :key="member.id">
-                <div class="member-card" @click="handleMemberClick(member.id)">
+                <div
+                  class="member-card"
+                  :class="{ 'selected': $store.team.selectedMemberId === member.id }"
+                  @click="handleMemberClick(member.id)"
+                >
                   <div class="member-header">
                     <div
                       class="member-avatar"
