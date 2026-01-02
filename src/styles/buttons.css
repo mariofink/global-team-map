@@ -26,7 +26,7 @@
 }
 
 .btn-add-member {
-  margin-top: var(--spacing-md);
+  margin-block: var(--spacing-md);
 }
 
 .btn-primary:disabled,

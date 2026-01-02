@@ -24,6 +24,72 @@
 
       <div class="content">
         <div class="sidebar">
+          <input
+            x-ref="fileInput"
+            type="file"
+            accept=".json"
+            @change="handleImport($event)"
+            style="display: none"
+          />
+          <div class="team-list">
+            <div class="header">
+              <h2>
+                Team Members (<span
+                  x-text="$store.team.members?.length || 0"
+                ></span
+                >)
+              </h2>
+            </div>
+
+            <template
+              x-if="!$store.team.members || $store.team.members.length === 0"
+            >
+              <div class="empty-state">
+                <p>
+                  No team members yet. Add your first member to get started!
+                </p>
+              </div>
+            </template>
+
+            <div class="members-grid">
+              <template x-for="member in $store.team.members" :key="member.id">
+                <div class="member-card" @click="handleMemberClick(member.id)">
+                  <div class="member-header">
+                    <div
+                      class="member-avatar"
+                      x-text="getInitials(member.name)"
+                    ></div>
+                    <div class="member-info">
+                      <h3 x-text="member.name"></h3>
+                      <p
+                        x-if="member.role"
+                        class="role"
+                        x-text="member.role"
+                      ></p>
+                    </div>
+                  </div>
+                  <div class="member-details">
+                    <p class="location">
+                      📍 <span x-text="member.location"></span>
+                    </p>
+                    <p class="timezone">
+                      🕐 <span x-text="member.timezone"></span>
+                    </p>
+                  </div>
+                  <button
+                    @click.stop="handleDeleteClick(member.id)"
+                    class="delete-btn"
+                    title="Delete member"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+          <button @click="$refs.dialog.showModal()" class="btn-add-member">
+            + Add Team Member
+          </button>
           <div class="share-buttons">
             <button
               @click="handleExport()"
@@ -47,66 +113,6 @@
               📋 Copy
             </button>
           </div>
-          <input
-            x-ref="fileInput"
-            type="file"
-            accept=".json"
-            @change="handleImport($event)"
-            style="display: none"
-          />
-          <div class="team-list">
-            <div class="header">
-              <h2>
-                Team Members (<span x-text="$store.team.members?.length || 0"></span>)
-              </h2>
-            </div>
-
-            <template x-if="!$store.team.members || $store.team.members.length === 0">
-              <div class="empty-state">
-                <p>
-                  No team members yet. Add your first member to get started!
-                </p>
-              </div>
-            </template>
-
-            <div class="members-grid">
-              <template x-for="member in $store.team.members" :key="member.id">
-                <div class="member-card" @click="handleMemberClick(member.id)">
-                  <div class="member-header">
-                    <div
-                      class="member-avatar"
-                      x-text="getInitials(member.name)"
-                    ></div>
-                    <div class="member-info">
-                      <h3 x-text="member.name"></h3>
-                      <p
-                        class="role"
-                        x-text="member.role || 'No role specified'"
-                      ></p>
-                    </div>
-                  </div>
-                  <div class="member-details">
-                    <p class="location">
-                      📍 <span x-text="member.location"></span>
-                    </p>
-                    <p class="timezone">
-                      🕐 <span x-text="member.timezone || 'Unknown'"></span>
-                    </p>
-                  </div>
-                  <button
-                    @click.stop="handleDeleteClick(member.id)"
-                    class="delete-btn"
-                    title="Delete member"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </template>
-            </div>
-          </div>
-          <button @click="$refs.dialog.showModal()" class="btn-add-member">
-            + Add Team Member
-          </button>
         </div>
 
         <div class="map-container">
