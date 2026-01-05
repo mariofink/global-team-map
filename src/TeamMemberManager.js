@@ -1,15 +1,39 @@
 /**
+ * @typedef {Object} TeamMember
+ * @property {string} id - Unique identifier
+ * @property {string} name - Member's full name
+ * @property {string} role - Job role/title
+ * @property {string} location - Full location string
+ * @property {number} latitude - Geographic latitude
+ * @property {number} longitude - Geographic longitude
+ * @property {string} timezone - IANA timezone identifier
+ */
+
+/**
+ * @typedef {Object} MemberData
+ * @property {string} name
+ * @property {string} role
+ * @property {string} location
+ * @property {number} latitude
+ * @property {number} longitude
+ * @property {string} timezone
+ */
+
+/**
  * TeamMemberManager handles all team member related operations
  * including CRUD operations and storage (no rendering)
  */
 export class TeamMemberManager {
   constructor() {
+    /** @type {TeamMember[]} */
     this.members = this.loadMembers();
-    this.onMembersChange = null; // Callback for when members change
+    /** @type {(() => void) | null} Callback for when members change */
+    this.onMembersChange = null;
   }
 
   /**
    * Get all team members
+   * @returns {TeamMember[]}
    */
   getMembers() {
     return this.members;
@@ -17,6 +41,8 @@ export class TeamMemberManager {
 
   /**
    * Add a new team member
+   * @param {MemberData} memberData - Data for the new member
+   * @returns {TeamMember} The created member
    */
   addMember(memberData) {
     const member = {
@@ -94,7 +120,12 @@ export class TeamMemberManager {
   }
 
   /**
-   * Export members to JSON file
+   * Exports all team members to a JSON file and triggers a download in the browser.
+   * Creates a blob from the members array, generates a downloadable link with a timestamped filename,
+   * and automatically triggers the download before cleaning up resources.
+   *
+   * @throws {Error} Throws an error if there are no team members to export
+   * @returns {void}
    */
   exportToFile() {
     if (this.members.length === 0) {
@@ -118,6 +149,7 @@ export class TeamMemberManager {
 
   /**
    * Export members as JSON string
+   * @returns {string} JSON string of all members
    */
   exportToJSON() {
     return JSON.stringify(this.members, null, 2);
@@ -140,9 +172,7 @@ export class TeamMemberManager {
    * Notify listeners that members have changed
    */
   notifyChange() {
-    if (this.onMembersChange) {
-      this.onMembersChange(this.members);
-    }
+    this.onMembersChange && this.onMembersChange();
   }
 
   /**

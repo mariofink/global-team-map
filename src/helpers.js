@@ -1,9 +1,20 @@
+/**
+ * Escape HTML special characters to prevent XSS
+ * @param {string} text - The text to escape
+ * @returns {string} HTML-safe string
+ */
 const escapeHtml = (text) => {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 };
 
+/**
+ * Fetch timezone information for given coordinates
+ * @param {number} latitude - Geographic latitude
+ * @param {number} longitude - Geographic longitude
+ * @returns {Promise<string>} IANA timezone identifier
+ */
 const fetchTimezone = async (latitude, longitude) => {
   return new Promise(async (resolve, reject) => {
     try {

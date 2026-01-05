@@ -5,20 +5,27 @@ import { memberListHelpers } from "./concerns/memberListHelpers.js";
 import { formHandlers } from "./concerns/formHandlers.js";
 import { dataOperations } from "./concerns/dataOperations.js";
 
+/**
+ * @typedef {ReturnType<typeof import('./stores/teamStore.js').createTeamStore>} TeamStore
+ * @typedef {import('./components/locationSearch.js').LocationDetail} LocationDetail
+ */
+
 // Wait for Alpine.js to be available
 document.addEventListener("alpine:init", () => {
   // Initialize map first (must be done before store tries to update it)
   map.init();
 
   // Register Alpine.js components
+  // @ts-ignore
   window.locationSearch = locationSearch;
 
-  // Register Alpine store
-  Alpine.store("team", createTeamStore());
-  Alpine.store("team").init();
+  // Register and init Alpine store
+  // @ts-ignore
+  Alpine.store("team", createTeamStore()).init();
 });
 
 // Main Alpine.js app component
+// @ts-ignore
 window.app = {
   form: {
     name: "",
@@ -39,9 +46,10 @@ window.app = {
 
     // Listen for location-selected events from location search
     window.addEventListener("location-selected", (e) => {
-      this.form.location = e.detail.display_name;
-      this.form.latitude = e.detail.latitude.toFixed(6);
-      this.form.longitude = e.detail.longitude.toFixed(6);
+      const event = /** @type {CustomEvent<LocationDetail>} */ (e);
+      this.form.location = event.detail.display_name;
+      this.form.latitude = event.detail.latitude.toFixed(6);
+      this.form.longitude = event.detail.longitude.toFixed(6);
     });
   },
 

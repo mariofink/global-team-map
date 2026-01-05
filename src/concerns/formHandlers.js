@@ -1,6 +1,7 @@
 /**
- * Form Handling Logic
+ * @typedef {ReturnType<typeof import('../stores/teamStore.js').createTeamStore>} TeamStore
  */
+
 export const formHandlers = {
   async handleAddMember(event) {
     const latitude = parseFloat(this.form.latitude);
@@ -25,7 +26,10 @@ export const formHandlers = {
     this.isSubmitting = true;
 
     try {
-      const member = await Alpine.store("team").addMember({
+      const teamStore = /** @type {TeamStore} */ (
+        globalThis.Alpine.store("team")
+      );
+      const member = await teamStore.addMember({
         name: this.form.name,
         role: this.form.role,
         location: this.form.location,
@@ -41,6 +45,7 @@ export const formHandlers = {
         this.showNotification("Team member added successfully!", "success");
       }
     } catch (error) {
+      console.error("Error adding team member:", error);
       alert("Failed to add team member");
     } finally {
       this.isSubmitting = false;

@@ -1,3 +1,10 @@
+/**
+ * @typedef { import("./TeamMemberManager.js").TeamMember } TeamMember
+ */
+
+/** @type {typeof import('leaflet')} */
+const L = globalThis.L;
+
 import { escapeHtml } from "./helpers.js";
 
 let map;
@@ -28,6 +35,9 @@ const init = () => {
   }).addTo(map);
 };
 
+/**
+ * @param {TeamMember[]} members
+ */
 const updateMap = (members) => {
   if (!map) return;
   // Clear existing markers

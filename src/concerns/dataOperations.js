@@ -1,10 +1,14 @@
 /**
- * Data Import/Export Operations
+ * @typedef {ReturnType<typeof import('../stores/teamStore.js').createTeamStore>} TeamStore
  */
+
 export const dataOperations = {
   handleExport() {
     try {
-      Alpine.store("team").exportToFile();
+      const teamStore = /** @type {TeamStore} */ (
+        globalThis.Alpine.store("team")
+      );
+      teamStore.exportToFile();
       this.showNotification(
         "Team data exported! Share the file with others.",
         "success"
@@ -21,8 +25,12 @@ export const dataOperations = {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const teamStore = Alpine.store("team");
-        const imported = teamStore.importFromJSON(e.target.result);
+        const teamStore = /** @type {TeamStore} */ (
+          globalThis.Alpine.store("team")
+        );
+        const imported = teamStore.importFromJSON(
+          /** @type {string} */ (e.target.result)
+        );
 
         // Ask for confirmation if there's existing data
         const currentMembers = teamStore.members;
@@ -52,7 +60,10 @@ export const dataOperations = {
 
   handleCopy() {
     try {
-      const dataStr = Alpine.store("team").exportToJSON();
+      const teamStore = /** @type {TeamStore} */ (
+        globalThis.Alpine.store("team")
+      );
+      const dataStr = teamStore.exportToJSON();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(dataStr).then(() => {
           this.showNotification(

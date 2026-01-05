@@ -3,6 +3,13 @@
  * Handles location autocomplete using Nominatim API
  */
 
+/**
+ * @typedef {Object} LocationDetail
+ * @property {number} latitude - The latitude coordinate of the location
+ * @property {number} longitude - The longitude coordinate of the location
+ * @property {string} display_name - The human-readable name/address of the location
+ */
+
 export default function locationSearch() {
   return {
     query: "",
@@ -35,6 +42,7 @@ export default function locationSearch() {
     },
 
     selectLocation(location) {
+      /** @type {LocationDetail} */
       const detail = {
         latitude: parseFloat(location.lat),
         longitude: parseFloat(location.lon),
