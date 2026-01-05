@@ -129,7 +129,7 @@ export function createTeamStore() {
 
     /**
      * Replace all members with new data
-     * @param {MemberData[]} members - Array of member data to replace with
+     * @param {TeamMember[]} members - Array of member data to replace with
      */
     replaceMembers(members) {
       this.memberManager.replaceMembers(members);
