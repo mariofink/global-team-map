@@ -52,7 +52,10 @@
             </template>
 
             <div class="members-grid">
-              <template x-for="member in $store.team.members" :key="member.id">
+              <template
+                x-for="member in $store.team.members.slice().sort((a, b) => a.name.localeCompare(b.name))"
+                :key="member.id"
+              >
                 <div
                   class="member-card"
                   :class="{ 'selected': $store.team.selectedMemberId === member.id }"
