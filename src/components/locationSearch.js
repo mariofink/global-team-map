@@ -30,7 +30,7 @@ export default function locationSearch() {
       }
 
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(
           this.query
         )}`;
         const response = await fetch(url);
