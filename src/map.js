@@ -7,9 +7,16 @@ const L = globalThis.L;
 
 import { escapeHtml } from "./helpers.js";
 
+/** @type {import('leaflet').Map | undefined} */
 let map;
+/** @type {Record<string, import('leaflet').Marker>} */
 let markers = {};
 
+/**
+ * Get the current local time for a given timezone
+ * @param {string} timezone - IANA timezone identifier
+ * @returns {string} Formatted time string or "Invalid timezone"
+ */
 const getLocalTime = (timezone) => {
   try {
     const now = new Date();
@@ -25,6 +32,10 @@ const getLocalTime = (timezone) => {
   }
 };
 
+/**
+ * Initialize the Leaflet map
+ * @returns {void}
+ */
 const init = () => {
   // Initialize Leaflet map
   map = L.map("map").setView([20, 0], 2);
@@ -83,12 +94,22 @@ const updateMap = (members) => {
   }
 };
 
+/**
+ * Fly to a specific location on the map
+ * @param {[number, number]} latlon - Latitude and longitude coordinates
+ * @returns {void}
+ */
 const flyTo = (latlon) => {
   map.flyTo(latlon, 6, {
     duration: 1.5,
   });
 };
 
+/**
+ * Open the popup for a specific marker
+ * @param {string} id - Member ID
+ * @returns {void}
+ */
 const openPopup = (id) => {
   markers[id] && markers[id].openPopup();
 };

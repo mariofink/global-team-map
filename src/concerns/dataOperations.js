@@ -3,6 +3,10 @@
  */
 
 export const dataOperations = {
+  /**
+   * Export team data to a downloadable JSON file
+   * @returns {void}
+   */
   handleExport() {
     try {
       const teamStore = /** @type {TeamStore} */ (
@@ -18,8 +22,15 @@ export const dataOperations = {
     }
   },
 
+  /**
+   * Handle file import from user's file system
+   * Validates and optionally replaces existing team data
+   * @param {Event} event - File input change event
+   * @returns {void}
+   */
   handleImport(event) {
-    const file = event.target.files[0];
+    const input = /** @type {HTMLInputElement} */ (event.target);
+    const file = input.files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -39,7 +50,7 @@ export const dataOperations = {
             `You have ${currentMembers.length} existing team member(s). Replace with ${imported.length} imported member(s)?`
           );
           if (!replace) {
-            event.target.value = "";
+            input.value = "";
             return;
           }
         }
@@ -52,12 +63,16 @@ export const dataOperations = {
       } catch (error) {
         alert("Error importing file: " + error.message);
       }
-      event.target.value = "";
+      input.value = "";
     };
 
     reader.readAsText(file);
   },
 
+  /**
+   * Copy team data to clipboard as JSON
+   * @returns {void}
+   */
   handleCopy() {
     try {
       const teamStore = /** @type {TeamStore} */ (

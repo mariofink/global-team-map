@@ -9,6 +9,14 @@ import { dataOperations } from "./concerns/dataOperations.js";
  * @typedef {ReturnType<typeof import('./stores/teamStore.js').createTeamStore>} TeamStore
  * @typedef {import('./components/locationSearch.js').LocationDetail} LocationDetail
  */
+/**
+ * @typedef {Object} MemberFormData
+ * @property {string} name
+ * @property {string} role
+ * @property {string} location
+ * @property {string} latitude
+ * @property {string} longitude
+ */
 
 // Wait for Alpine.js to be available
 document.addEventListener("alpine:init", () => {
@@ -19,14 +27,14 @@ document.addEventListener("alpine:init", () => {
   // @ts-ignore
   window.locationSearch = locationSearch;
 
-  // Register and init Alpine store
   // @ts-ignore
-  Alpine.store("team", createTeamStore()).init();
+  Alpine.store("team", createTeamStore());
 });
 
 // Main Alpine.js app component
 // @ts-ignore
 window.app = {
+  /** @type {MemberFormData} */
   form: {
     name: "",
     role: "",
@@ -53,6 +61,12 @@ window.app = {
     });
   },
 
+  /**
+   * Display a temporary notification message
+   * @param {string} message - Message to display
+   * @param {"success" | "error" | "info"} [type="success"] - Notification type
+   * @returns {void}
+   */
   showNotification(message, type = "success") {
     const notification = document.createElement("div");
     notification.className = `notification notification-${type}`;

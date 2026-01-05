@@ -3,7 +3,12 @@
  */
 
 export const formHandlers = {
-  async handleAddMember(event) {
+  /**
+   * Handle form submission to add a new team member
+   * Validates coordinates, fetches timezone, and adds member to store
+   * @returns {Promise<void>}
+   */
+  async handleAddMember() {
     const latitude = parseFloat(this.form.latitude);
     const longitude = parseFloat(this.form.longitude);
 
@@ -52,6 +57,10 @@ export const formHandlers = {
     }
   },
 
+  /**
+   * Reset form fields and location search state
+   * @returns {void}
+   */
   resetForm() {
     this.form = {
       name: "",

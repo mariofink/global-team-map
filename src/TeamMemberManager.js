@@ -64,6 +64,8 @@ export class TeamMemberManager {
 
   /**
    * Delete a team member by ID
+   * @param {string} id - Member ID to delete
+   * @returns {void}
    */
   deleteMember(id) {
     this.members = this.members.filter((m) => m.id !== id);
@@ -73,6 +75,8 @@ export class TeamMemberManager {
 
   /**
    * Find a member by ID
+   * @param {string} id - Member ID to find
+   * @returns {TeamMember | undefined} The member or undefined if not found
    */
   findMember(id) {
     return this.members.find((m) => m.id === id);
@@ -80,6 +84,7 @@ export class TeamMemberManager {
 
   /**
    * Save members to localStorage
+   * @returns {void}
    */
   saveMembers() {
     localStorage.setItem("globalTeamMembers", JSON.stringify(this.members));
@@ -87,6 +92,7 @@ export class TeamMemberManager {
 
   /**
    * Load members from localStorage
+   * @returns {TeamMember[]} Array of team members
    */
   loadMembers() {
     const stored = localStorage.getItem("globalTeamMembers");
@@ -95,6 +101,8 @@ export class TeamMemberManager {
 
   /**
    * Replace all members (used for import)
+   * @param {TeamMember[]} newMembers - Array of new members to replace with
+   * @returns {void}
    */
   replaceMembers(newMembers) {
     this.members = newMembers;
@@ -104,6 +112,8 @@ export class TeamMemberManager {
 
   /**
    * Validate member data structure
+   * @param {any} members - Data to validate
+   * @returns {boolean} True if valid member array
    */
   validateMembers(members) {
     if (!Array.isArray(members)) {
@@ -157,6 +167,8 @@ export class TeamMemberManager {
 
   /**
    * Import members from JSON
+   * @param {string} jsonString - JSON string containing member data
+   * @returns {TeamMember[]} Array of imported members
    */
   importFromJSON(jsonString) {
     const imported = JSON.parse(jsonString);
@@ -170,6 +182,7 @@ export class TeamMemberManager {
 
   /**
    * Notify listeners that members have changed
+   * @returns {void}
    */
   notifyChange() {
     this.onMembersChange && this.onMembersChange();
@@ -177,6 +190,8 @@ export class TeamMemberManager {
 
   /**
    * Set callback for when members change
+   * @param {() => void} callback - Callback function to execute when members change
+   * @returns {void}
    */
   setOnMembersChange(callback) {
     this.onMembersChange = callback;
