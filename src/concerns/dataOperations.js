@@ -1,3 +1,5 @@
+import { getCorsProxyUrl } from "../helpers.js";
+
 /**
  * @typedef {ReturnType<typeof import('../stores/teamStore.js').createTeamStore>} TeamStore
  */
@@ -89,6 +91,44 @@ export const dataOperations = {
       }
     } catch (error) {
       alert(error.message);
+    }
+  },
+
+  /**
+   * Load team data from URL parameter if present
+   * Checks for ?data=<url> parameter and fetches team data from that URL
+   * @returns {Promise<void>}
+   */
+  async loadFromUrlParameter() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataUrl = urlParams.get("data");
+
+    if (!dataUrl) {
+      return;
+    }
+
+    try {
+      // Use CORS proxy for external URLs to avoid CORS restrictions
+      const fetchUrl = getCorsProxyUrl(dataUrl);
+
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonData = await response.text();
+      const teamStore = /** @type {TeamStore} */ (
+        globalThis.Alpine.store("team")
+      );
+
+      const imported = teamStore.importFromJSON(jsonData);
+      teamStore.replaceMembers(imported);
+    } catch (error) {
+      console.error("Error loading data from URL:", error);
+      this.showNotification(
+        `Failed to load data from URL: ${error.message}`,
+        "error"
+      );
     }
   },
 };

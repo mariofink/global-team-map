@@ -35,4 +35,28 @@ const fetchTimezone = async (latitude, longitude) => {
   });
 };
 
-export { escapeHtml, fetchTimezone };
+/**
+ * Get CORS proxy URL for external URLs
+ * Checks if URL is same-origin, if not, uses CORS proxy
+ * @param {string} url - The URL to fetch from
+ * @returns {string} The URL to use (with proxy if needed)
+ */
+const getCorsProxyUrl = (url) => {
+  try {
+    const targetUrl = new URL(url);
+    const currentOrigin = window.location.origin;
+
+    // If same origin, no proxy needed
+    if (targetUrl.origin === currentOrigin) {
+      return url;
+    }
+
+    // Use CORS proxy for external URLs
+    return `https://corsproxy.io/?${encodeURIComponent(url)}`;
+  } catch (error) {
+    // If URL parsing fails, return as-is
+    return url;
+  }
+};
+
+export { escapeHtml, fetchTimezone, getCorsProxyUrl };

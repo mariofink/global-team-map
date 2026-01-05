@@ -59,6 +59,9 @@ window.app = {
       this.form.latitude = event.detail.latitude.toFixed(6);
       this.form.longitude = event.detail.longitude.toFixed(6);
     });
+
+    // Check for data URL parameter and load data
+    dataOperations.loadFromUrlParameter();
   },
 
   /**
