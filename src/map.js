@@ -63,7 +63,7 @@ const updateMap = (members) => {
                         <h3>${escapeHtml(member.name)}</h3>
                         ${
                           member.role
-                            ? `<p><strong>Role:</strong> ${escapeHtml(
+                            ? `<p><strong>🧑‍💻 </strong> ${escapeHtml(
                                 member.role
                               )}</p>`
                             : ""
