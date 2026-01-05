@@ -59,4 +59,25 @@ const getCorsProxyUrl = (url) => {
   }
 };
 
-export { escapeHtml, fetchTimezone, getCorsProxyUrl };
+/**
+ * Format location string to show only city and country
+ * Takes a full location string and extracts city and country
+ * @param {string} fullLocation - Full location string from Nominatim (e.g., "Fulda, Landkreis Fulda, Hessen, Deutschland")
+ * @returns {string} Formatted location as "City, Country"
+ */
+const formatLocation = (fullLocation) => {
+  if (!fullLocation) return "";
+
+  const parts = fullLocation.split(",").map((part) => part.trim());
+
+  if (parts.length === 0) return fullLocation;
+  if (parts.length === 1) return parts[0];
+
+  // First part is usually the city/town, last part is usually the country
+  const city = parts[0];
+  const country = parts[parts.length - 1];
+
+  return `${city}, ${country}`;
+};
+
+export { escapeHtml, fetchTimezone, getCorsProxyUrl, formatLocation };
